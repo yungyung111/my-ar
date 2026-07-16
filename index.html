@@ -55,18 +55,23 @@
 
       targetEl.addEventListener("targetFound", event => {
         console.log("產品偵測成功！");
-        overlay.style.display = "none";
+        overlay.style.display = "none"; 
+        // 強制讓影片區塊顯示出來
+        video.style.display = "block"; 
         video.play();
       });
 
       targetEl.addEventListener("targetLost", event => {
         console.log("產品離開視線");
         overlay.style.display = "flex";
+        // 隱藏影片
+        video.style.display = "none";
         video.pause();
       });
 
       document.body.addEventListener("click", () => {
         video.muted = false;
+        video.play();
       });
     </script>
   </body>
