@@ -29,21 +29,25 @@
       <div class="scanner-box"></div>
     </div>
 
-    <!-- AR 舞台 (完美無空格版本) -->
+    <!-- AR 舞台 -->
     <a-scene mindar-image="imageTargetSrc:./husktargets.mind;autoStart:true;uiLoading:no;uiError:no;uiScanning:no;" color-space="sRGB" renderer="colorManagement:true,physicallyCorrectLights" vr-mode-ui="enabled:false" device-orientation-permission-ui="enabled:false">
       
       <a-assets>
-        <!-- 載入你上傳在同一個 GitHub 倉庫下的去背影片，這樣就絕對不會有跨網域 (CORS) 阻擋的問題了！ -->
-        <video id="ar-video" src="https://yungyung111.github.io/my-ar/husk-animation.webm" loop="true" crossorigin="anonymous" playsinline webkit-playsinline muted></video>
-      </assets>
+        <!-- 
+          【關鍵修正】：
+          1. 移除所有中括號，使用乾淨的相對路徑。
+          2. 加入 preload="auto" 強制瀏覽器預載影片。
+          3. 加入 playsinline 和 webkit-playsinline 防止 iOS 彈出全螢幕播放器。
+        -->
+        <video id="ar-video" src="./husk-animation.webm" preload="auto" loop="true" crossorigin="anonymous" playsinline webkit-playsinline muted></video>
+      </a-assets>
 
-      <!-- 萬無一失的 a-camera -->
+      <!-- 萬無一失的相機 -->
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity id="ar-target" mindar-image-target="targetIndex: 0">
         <!-- 
-          辨識成功後，這裡播放你的 2D 去背動畫影片。
-          Z 軸設為 0.1 確保飄浮在貓咪前面。
+          將 Z 軸位置設為 0.1，寬高比例維持 1:1，確保影片不會潛入背景圖後方 
         -->
         <a-video src="#ar-video" width="1" height="1" position="0 0 0.1" rotation="0 0 0"></a-video>
       </a-entity>
@@ -54,22 +58,29 @@
       const video = document.querySelector('#ar-video');
       const overlay = document.querySelector('#scanning-overlay');
 
+      // 監聽：當鏡頭辨識成功
       targetEl.addEventListener("targetFound", event => {
         console.log("產品偵測成功！");
         overlay.style.display = "none";
-        video.play(); // 偵測到貓咪，自動播放影片
+        
+        // 嘗試播放影片。如果被瀏覽器擋住，會在使用者點擊螢幕後立刻播放
+        video.play().catch(err => {
+          console.log("播放被瀏覽器安全政策暫時攔截，等待用家點擊螢幕解鎖", err);
+        });
       });
 
+      // 監聽：當鏡頭離開產品
       targetEl.addEventListener("targetLost", event => {
         console.log("產品離開視線");
         overlay.style.display = "flex";
-        video.pause(); // 離開視線，暫停影片
+        video.pause();
       });
 
-      // 點擊螢幕可以解鎖聲音（針對 iOS / Safari 的安全限制）
+      // 【主動觸發機制】：當用家一進入網頁，在畫面上任意地方點擊一下，立刻幫影片「解鎖播放權限」
       document.body.addEventListener("click", () => {
-        video.muted = false;
+        video.muted = false; // 解除靜音（也可以維持靜音，看你影片有沒有聲音）
         video.play();
+        console.log("影片播放權限已被點擊解鎖！");
       });
     </script>
   </body>
