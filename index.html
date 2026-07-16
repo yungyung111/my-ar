@@ -2,13 +2,10 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>我的產品 AR 動畫 (終極版)</title>
+    <title>我的產品 AR 動畫 (精靈圖無響應版)</title>
     <!-- 引入 A-Frame 與 MindAR 庫 -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-    
-    <!-- 【關鍵引入】：Sprite 動畫播放外掛 -->
-    <script src="https://cdn.jsdelivr.net/gh/T-T/aframe-sprite-animation-component@master/dist/aframe-sprite-animation-component.min.js"></script>
     
     <style>
       body { margin: 0; overflow: hidden; }
@@ -26,6 +23,62 @@
         box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
       }
     </style>
+
+    <script>
+      // 自製「Sprite Sheet 播放器」組件
+      AFRAME.registerComponent('custom-sprite', {
+        schema: {
+          cols: {type: 'number', default: 1},
+          rows: {type: 'number', default: 1},
+          fps: {type: 'number', default: 10}
+        },
+        init: function () {
+          this.currentFrame = 0;
+          this.totalFrames = this.data.cols * this.data.rows;
+          this.delay = 1000 / this.data.fps;
+          this.timeSinceLastFrame = 0;
+          this.texture = null;
+
+          // 監聽紋理載入
+          this.el.addEventListener('materialtextureloaded', () => {
+            this.setupTexture();
+          });
+        },
+        setupTexture: function () {
+          const mesh = this.el.getObject3D('mesh');
+          if (!mesh) return;
+          this.texture = mesh.material.map;
+          if (this.texture) {
+            // 關鍵：將貼圖大小裁切為原圖的 1/cols 寬、1/rows 高
+            this.texture.repeat.set(1 / this.data.cols, 1 / this.data.rows);
+            this.updateFrame();
+          }
+        },
+        tick: function (time, timeDelta) {
+          // 如果貼圖還沒準備好，每幀嘗試獲取一次
+          if (!this.texture) {
+            this.setupTexture();
+            return;
+          }
+
+          this.timeSinceLastFrame += timeDelta;
+          if (this.timeSinceLastFrame >= this.delay) {
+            this.currentFrame = (this.currentFrame + 1) % this.totalFrames;
+            this.updateFrame();
+            this.timeSinceLastFrame = 0;
+          }
+        },
+        updateFrame: function () {
+          if (!this.texture) return;
+          const col = this.currentFrame % this.data.cols;
+          const row = Math.floor(this.currentFrame / this.data.cols);
+
+          // 計算目前影格的 X 與 Y 偏移量
+          this.texture.offset.x = col / this.data.cols;
+          this.texture.offset.y = 1 - (row + 1) / this.data.rows;
+        }
+      });
+    </script>
   </head>
   <body>
 
@@ -37,7 +90,7 @@
     <a-scene mindar-image="imageTargetSrc:./husktargets.mind;autoStart:true;uiLoading:no;uiError:no;uiScanning:no;" color-space="sRGB" renderer="colorManagement:true,physicallyCorrectLights" vr-mode-ui="enabled:false" device-orientation-permission-ui="enabled:false">
       
       <a-assets>
-        <!-- 載入去背的 Sprite Sheet 大圖 -->
+        <!-- 載入去背大圖 -->
         <img id="ar-spritesheet" src="./husk-spritesheet.png" crossorigin="anonymous" />
       </a-assets>
 
@@ -46,23 +99,21 @@
 
       <a-entity id="ar-target" mindar-image-target="targetIndex: 0">
         <!-- 
-          【核心修改】：
-          我們使用 <a-entity> 配合 plane 幾何體。
-          在 material 裡開啟 transparent 確保去背。
-          並加上 sprite-animation 元件：
-          cols: 大圖的列數 (例如 5)
-          rows: 大圖的行數 (例如 6)
-          loop: 是否循環播放 (true)
-          frameDuration: 每一格停留的毫秒數 (例如 41 毫秒 = 大約 24fps)
+          【完美設定】：
+          1. 加上我們自製的 custom-sprite 屬性，設定 cols 為 5，rows 為 1。
+          2. fps 設為 10（代表每秒跑 10 格動作，覺得太慢可以改成 12 或 15）。
+          3. 為了防止貓咪被壓扁，我們把 width 設為 1.2 (一格貓咪的原比例大約是 1.2:1)。
         -->
-        <a-entity 
-          id="ar-display-entity"
-          geometry="primitive: plane; width: 1; height: 1;" 
+        <a-image 
+          id="ar-display-image"
+          src="#ar-spritesheet" 
+          width="1.2" 
+          height="1" 
           position="0 0 0.1" 
-          rotation="0 0 0"
-          material="shader: flat; src: #ar-spritesheet; transparent: true; alphaTest: 0.05; depthWrite: false;"
-          sprite-animation="cols: 5; rows: 1; loop: true; frameDuration: 41;">
-        </a-entity>
+          rotation="0 0 0" 
+          material="shader: flat; transparent: true; alphaTest: 0.1; depthWrite: false;"
+          custom-sprite="cols: 5; rows: 1; fps: 10">
+        </a-image>
       </a-entity>
     </a-scene>
 
@@ -70,13 +121,11 @@
       const targetEl = document.querySelector('#ar-target');
       const overlay = document.querySelector('#scanning-overlay');
 
-      // 監聽：當鏡頭辨識成功
       targetEl.addEventListener("targetFound", event => {
         console.log("產品偵測成功！");
         overlay.style.display = "none";
       });
 
-      // 監聽：當鏡頭離開產品
       targetEl.addEventListener("targetLost", event => {
         console.log("產品離開視線");
         overlay.style.display = "flex";
