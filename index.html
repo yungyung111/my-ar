@@ -1,96 +1,73 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 <html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.3">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'; min-height: 15.0px}
-  </style>
-</head>
-<body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;我的產品 AR 動畫&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- 引入 A-Frame 與 MindAR 庫 --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://aframe.io/releases/1.5.0/aframe.min.js"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>body { margin: 0; overflow: hidden; }</p>
-<p class="p1"><span class="Apple-converted-space">      </span>/* 製作一個簡單的「掃描提示框」畫在螢幕中央，引導用家 */</p>
-<p class="p1"><span class="Apple-converted-space">      </span>#scanning-overlay {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>position: fixed;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>top: 0; left: 0; width: 100%; height: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>background: transparent;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>display: flex; justify-content: center; align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>z-index: 999; pointer-events: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p1"><span class="Apple-converted-space">      </span>.scanner-box {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>width: 250px; height: 250px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>border: 3px dashed #00ffcc;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>border-radius: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;body&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- 掃描引導框，辨識成功後會用腳本隱藏 --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="scanning-overlay"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="scanner-box"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- AR 舞台 (已更新識別檔路徑為 ./husktargets.mind) --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;a-scene mindar-image="imageTargetSrc: ./husktargets.mind; autoStart: true; uiLoading: no; uiError: no; uiScanning: no;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false"&gt;</p>
-<p class="p2"><span class="Apple-converted-space">      </span></p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;a-assets&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- 載入你的去背動畫影片 (已更新影片檔名為 ./husk-animation.webm) --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;video id="ar-video" src="./husk-animation.webm" loop="true" crossorigin="anonymous" playsinline webkit-playsinline muted&gt;&lt;/video&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/assets&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;a-camera position="0 0 0" look-controls="enabled: false"&gt;&lt;/a-camera&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;!-- targetIndex: 0 代表你 husktargets.mind 裡的第一張識別圖 --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;a-entity id="ar-target" mindar-image-target="targetIndex: 0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;!--<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">          </span>這裡放置你的 2D 動畫平面。</p>
-<p class="p1"><span class="Apple-converted-space">          </span>width/height 代表寬高比例（可依影片比例微調，例如 16:9 可改為 width="1.6" height="0.9"）。</p>
-<p class="p1"><span class="Apple-converted-space">          </span>position 的 Z 軸設為 0.05 讓動畫微微往前飄浮，更有立體感！</p>
-<p class="p1"><span class="Apple-converted-space">        </span>--&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;a-video src="#ar-video" width="1" height="1" position="0 0 0.05" rotation="0 0 0"&gt;&lt;/a-video&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/a-entity&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/a-scene&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const targetEl = document.querySelector('#ar-target');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const video = document.querySelector('#ar-video');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const overlay = document.querySelector('#scanning-overlay');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>// 當鏡頭「偵測到產品」時的動作</p>
-<p class="p1"><span class="Apple-converted-space">      </span>targetEl.addEventListener("targetFound", event =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>console.log("產品偵測成功！");</p>
-<p class="p1"><span class="Apple-converted-space">        </span>overlay.style.display = "none"; // 隱藏掃描框</p>
-<p class="p1"><span class="Apple-converted-space">        </span>video.play(); // 開始播放動畫</p>
-<p class="p1"><span class="Apple-converted-space">      </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>// 當鏡頭「離開產品」時的動作</p>
-<p class="p1"><span class="Apple-converted-space">      </span>targetEl.addEventListener("targetLost", event =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>console.log("產品離開視線");</p>
-<p class="p1"><span class="Apple-converted-space">        </span>overlay.style.display = "flex"; // 重新顯示掃描框</p>
-<p class="p1"><span class="Apple-converted-space">        </span>video.pause(); // 暫停動畫，節省手機效能</p>
-<p class="p1"><span class="Apple-converted-space">      </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>// 點擊螢幕可以解鎖聲音（手機瀏覽器安全機制限制自動播放帶聲音的影片）</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.body.addEventListener("click", () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>video.muted = false;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>});</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
-</body>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>我的產品 AR 動畫</title>
+    <!-- 引入 A-Frame 與 MindAR 庫 -->
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <style>
+      body { margin: 0; overflow: hidden; }
+      #scanning-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: transparent;
+        display: flex; justify-content: center; align-items: center;
+        z-index: 999; pointer-events: none;
+      }
+      .scanner-box {
+        width: 250px; height: 250px;
+        border: 3px dashed #00ffcc;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+
+    <div id="scanning-overlay">
+      <div class="scanner-box"></div>
+    </div>
+
+    <!-- AR 舞台 -->
+    <a-scene mindar-image="imageTargetSrc: ./husktargets.mind; autoStart: true; uiLoading: no; uiError: no; uiScanning: no;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+      
+      <a-assets>
+        <!-- 載入去背動畫影片 -->
+        <video id="ar-video" src="./husk-animation.webm" loop="true" crossorigin="anonymous" playsinline webkit-playsinline muted></video>
+      </assets>
+
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <a-entity id="ar-target" mindar-image-target="targetIndex: 0">
+        <!-- 
+          這裡放置你的 2D 動畫平面。
+          width/height 代表寬高比例。
+        -->
+        <a-video src="#ar-video" width="1" height="1" position="0 0 0.05" rotation="0 0 0"></a-video>
+      </a-entity>
+    </a-scene>
+
+    <script>
+      const targetEl = document.querySelector('#ar-target');
+      const video = document.querySelector('#ar-video');
+      const overlay = document.querySelector('#scanning-overlay');
+
+      targetEl.addEventListener("targetFound", event => {
+        console.log("產品偵測成功！");
+        overlay.style.display = "none";
+        video.play();
+      });
+
+      targetEl.addEventListener("targetLost", event => {
+        console.log("產品離開視線");
+        overlay.style.display = "flex";
+        video.pause();
+      });
+
+      document.body.addEventListener("click", () => {
+        video.muted = false;
+      });
+    </script>
+  </body>
 </html>
