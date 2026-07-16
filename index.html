@@ -55,11 +55,17 @@
     <script>
       const targetEl = document.querySelector('#ar-target');
       const overlay = document.querySelector('#scanning-overlay');
+      const displayImg = document.querySelector('#ar-display-image');
 
       // 監聽：當鏡頭辨識成功
       targetEl.addEventListener("targetFound", event => {
         console.log("產品偵測成功！");
         overlay.style.display = "none";
+        
+        // 【核心補丁】：強制 A-Frame 每幀更新紋理，釋放 APNG 的動畫訊號
+        if (displayImg) {
+          displayImg.setAttribute('material', 'needsUpdate', true);
+        }
       });
 
       // 監聽：當鏡頭離開產品
