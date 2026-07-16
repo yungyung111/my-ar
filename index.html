@@ -45,21 +45,22 @@
 <p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="scanner-box"&gt;&lt;/div&gt;</p>
 <p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
 <p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- AR 舞台 --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;a-scene mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; uiLoading: no; uiError: no; uiScanning: no;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- AR 舞台 (已更新識別檔路徑為 ./husktargets.mind) --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;a-scene mindar-image="imageTargetSrc: ./husktargets.mind; autoStart: true; uiLoading: no; uiError: no; uiScanning: no;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false"&gt;</p>
 <p class="p2"><span class="Apple-converted-space">      </span></p>
 <p class="p1"><span class="Apple-converted-space">      </span>&lt;a-assets&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- 載入你的去背 .webm 動畫影片 --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;video id="ar-video" src="./animation.webm" loop="true" crossorigin="anonymous" playsinline webkit-playsinline muted&gt;&lt;/video&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/a-assets&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- 載入你的去背動畫影片 (已更新影片檔名為 ./husk-animation.webm) --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;video id="ar-video" src="./husk-animation.webm" loop="true" crossorigin="anonymous" playsinline webkit-playsinline muted&gt;&lt;/video&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/assets&gt;</p>
 <p class="p2"><br></p>
 <p class="p1"><span class="Apple-converted-space">      </span>&lt;a-camera position="0 0 0" look-controls="enabled: false"&gt;&lt;/a-camera&gt;</p>
 <p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;!-- targetIndex: 0 代表你 targets.mind 裡的第一張識別圖 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;!-- targetIndex: 0 代表你 husktargets.mind 裡的第一張識別圖 --&gt;</p>
 <p class="p1"><span class="Apple-converted-space">      </span>&lt;a-entity id="ar-target" mindar-image-target="targetIndex: 0"&gt;</p>
 <p class="p1"><span class="Apple-converted-space">        </span>&lt;!--<span class="Apple-converted-space"> </span></p>
 <p class="p1"><span class="Apple-converted-space">          </span>這裡放置你的 2D 動畫平面。</p>
-<p class="p1"><span class="Apple-converted-space">          </span>width/height 代表寬高比例。position 的 Z 軸設為 0.05 讓動畫微微往前飄浮，更有立體感！</p>
+<p class="p1"><span class="Apple-converted-space">          </span>width/height 代表寬高比例（可依影片比例微調，例如 16:9 可改為 width="1.6" height="0.9"）。</p>
+<p class="p1"><span class="Apple-converted-space">          </span>position 的 Z 軸設為 0.05 讓動畫微微往前飄浮，更有立體感！</p>
 <p class="p1"><span class="Apple-converted-space">        </span>--&gt;</p>
 <p class="p1"><span class="Apple-converted-space">        </span>&lt;a-video src="#ar-video" width="1" height="1" position="0 0 0.05" rotation="0 0 0"&gt;&lt;/a-video&gt;</p>
 <p class="p1"><span class="Apple-converted-space">      </span>&lt;/a-entity&gt;</p>
