@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>我的產品 AR 動畫 (APNG 版)</title>
+    <title>我的產品 AR 動畫 (APNG 完美版)</title>
     <!-- 引入 A-Frame 與 MindAR 庫 -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -33,10 +33,7 @@
     <a-scene mindar-image="imageTargetSrc:./husktargets.mind;autoStart:true;uiLoading:no;uiError:no;uiScanning:no;" color-space="sRGB" renderer="colorManagement:true,physicallyCorrectLights" vr-mode-ui="enabled:false" device-orientation-permission-ui="enabled:false">
       
       <a-assets>
-        <!-- 
-          【關鍵修改】：將原本的 <video> 替換為 <img> 讀取 APNG
-          使用相對路徑，徹底避免跨網域問題
-        -->
+        <!-- 確保 src 指向你上傳的去背 APNG 圖片 -->
         <img id="ar-apng" src="./husk-animation.png" crossorigin="anonymous" />
       </a-assets>
 
@@ -45,10 +42,19 @@
 
       <a-entity id="ar-target" mindar-image-target="targetIndex: 0">
         <!-- 
-          使用 <a-image> 來渲染 APNG 動畫，
-          並開啟 transparent 與 shader: flat 確保發光且完全去背！
+          使用 <a-image> 承載 APNG。
+          加上 class="apng-render" 方便 JS 鎖定。
         -->
-        <a-image id="ar-display-image" src="#ar-apng" width="1" height="1" position="0 0 0.1" rotation="0 0 0" material="shader: flat; transparent: true; alphaTest: 0.1; depthWrite: false;"></a-image>
+        <a-image 
+          id="ar-display-image"
+          class="apng-render"
+          src="#ar-apng" 
+          width="1" 
+          height="1" 
+          position="0 0 0.1" 
+          rotation="0 0 0" 
+          material="shader: flat; transparent: true; alphaTest: 0.05; depthWrite: false;">
+        </a-image>
       </a-entity>
     </a-scene>
 
@@ -56,22 +62,38 @@
       const targetEl = document.querySelector('#ar-target');
       const overlay = document.querySelector('#scanning-overlay');
       const displayImg = document.querySelector('#ar-display-image');
+      
+      let animationFrameId = null;
+
+      // 【核心重繪驅動器】：利用 RequestAnimationFrame 強制 WebGL 重新上傳 APNG 紋理
+      function forceTextureUpdate() {
+        if (displayImg && displayImg.getObject3D('mesh')) {
+          const material = displayImg.getObject3D('mesh').material;
+          if (material && material.map) {
+            // 強制 Three.js（A-Frame 底層）將圖片最新的動態影格重新上傳到 GPU
+            material.map.needsUpdate = true;
+          }
+        }
+        // 持續循環重繪
+        animationFrameId = requestAnimationFrame(forceTextureUpdate);
+      }
 
       // 監聽：當鏡頭辨識成功
       targetEl.addEventListener("targetFound", event => {
         console.log("產品偵測成功！");
         overlay.style.display = "none";
-        
-        // 【核心補丁】：強制 A-Frame 每幀更新紋理，釋放 APNG 的動畫訊號
-        if (displayImg) {
-          displayImg.setAttribute('material', 'needsUpdate', true);
-        }
+        // 啟動重繪循環，APNG 就會開始動
+        forceTextureUpdate();
       });
 
       // 監聽：當鏡頭離開產品
       targetEl.addEventListener("targetLost", event => {
         console.log("產品離開視線");
         overlay.style.display = "flex";
+        // 停止循環，節省手機效能
+        if (animationFrameId) {
+          cancelAnimationFrame(animationFrameId);
+        }
       });
     </script>
   </body>
